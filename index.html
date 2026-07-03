@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Kartenmacher – eigene Spielkarten erstellen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Roboto:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined&icon_names=photo_camera,upload,add,close,star,download,palette,badge,image,list,check,arrow_back">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <span class="material-symbols-outlined topbar-icon">auto_awesome</span>
+    <h1>Kartenmacher</h1>
+  </header>
+
+  <main class="layout">
+
+    <section class="form-pane">
+
+      <div class="form-card">
+        <h2><span class="material-symbols-outlined">badge</span>Name</h2>
+        <input id="nameInput" class="text-input" type="text" maxlength="18" placeholder="Wie heißt deine Figur?">
+      </div>
+
+      <div class="form-card">
+        <h2><span class="material-symbols-outlined">image</span>Bild</h2>
+        <div class="image-buttons">
+          <button id="cameraBtn" class="btn btn-secondary" type="button">
+            <span class="material-symbols-outlined">photo_camera</span>Foto machen
+          </button>
+          <button id="uploadBtn" class="btn btn-secondary" type="button">
+            <span class="material-symbols-outlined">upload</span>Bild wählen
+          </button>
+        </div>
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
+        <input type="file" id="uploadInput" accept="image/*" hidden>
+      </div>
+
+      <div class="form-card">
+        <h2><span class="material-symbols-outlined">list</span>Eigenschaften</h2>
+        <div id="statsList" class="stats-list"></div>
+        <button id="addStatBtn" class="btn btn-text" type="button">
+          <span class="material-symbols-outlined">add</span>Eigenschaft hinzufügen
+        </button>
+      </div>
+
+      <div class="form-card">
+        <h2><span class="material-symbols-outlined">star</span>Bewertung</h2>
+        <div class="star-picker" id="starPicker"></div>
+      </div>
+
+      <div class="form-card">
+        <h2><span class="material-symbols-outlined">palette</span>Hintergrund</h2>
+        <div class="gradient-presets" id="gradientPresets"></div>
+        <div class="color-inputs">
+          <label>Farbe 1<input type="color" id="color1"></label>
+          <label>Farbe 2<input type="color" id="color2"></label>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="preview-pane">
+      <div class="card-preview" id="cardPreview">
+        <div class="card-inner" id="cardInner">
+          <div class="card-name" id="previewName">Name</div>
+          <div class="card-image-frame" id="previewImageFrame">
+            <img id="previewImage" alt="" hidden>
+            <span class="material-symbols-outlined placeholder-icon" id="previewPlaceholder">image</span>
+          </div>
+          <div class="card-stats" id="previewStats"></div>
+          <div class="card-stars" id="previewStars"></div>
+        </div>
+      </div>
+      <button id="exportBtn" class="btn btn-primary btn-large" type="button" disabled>
+        <span class="material-symbols-outlined">download</span>Karte speichern
+      </button>
+      <p class="hint" id="exportHint">Gib zuerst einen Namen ein.</p>
+    </section>
+
+  </main>
+
+  <div class="photo-crop-overlay" id="cropperModal" hidden>
+    <div class="cropper-topbar">
+      <button id="cropCancelBtn" class="btn btn-icon" type="button" aria-label="Abbrechen">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <span>Bild zuschneiden</span>
+      <button id="cropConfirmBtn" class="btn btn-icon btn-icon-primary" type="button" aria-label="Fertig">
+        <span class="material-symbols-outlined">check</span>
+      </button>
+    </div>
+    <div class="cropper-container">
+      <img id="cropperImage" alt="">
+    </div>
+    <div class="cropper-controls">
+      <span class="material-symbols-outlined">image</span>
+      <input type="range" id="zoomRange" min="0" max="100" value="0">
+      <span class="material-symbols-outlined zoom-icon-large">image</span>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
