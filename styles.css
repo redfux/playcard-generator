@@ -257,7 +257,7 @@ body {
   padding: 4% 6%;
   display: flex;
   flex-direction: column;
-  gap: 4%;
+  gap: 0.4em;
   box-shadow: 0 1px 3px rgba(0,0,0,.15);
 }
 .card-stats:empty { display: none; }
@@ -266,9 +266,10 @@ body {
   justify-content: space-between;
   gap: 8px;
   font-size: clamp(0.66rem, 3.52vw, 0.935rem);
+  line-height: 1.5;
   color: #3a2f5b;
   border-bottom: 1px solid rgba(0,0,0,.08);
-  padding-bottom: 2%;
+  padding-bottom: 0.35em;
 }
 .stat-display-row:last-child { border-bottom: none; padding-bottom: 0; }
 .stat-display-row .stat-display-label { font-weight: 700; flex: 0 1 42%; min-width: 0; }
