@@ -180,8 +180,20 @@ color2Input.addEventListener('input', () => {
 });
 
 // ---------- Preview rendering ----------
+function fitCardName() {
+  const cardWidth = document.getElementById('cardPreview').clientWidth || 300;
+  const minFontSize = Math.max(9, cardWidth * 0.045);
+  let fontSize = Math.max(minFontSize, cardWidth * 0.095);
+  previewName.style.fontSize = `${fontSize}px`;
+  while (fontSize > minFontSize && previewName.scrollHeight > previewName.clientHeight + 1) {
+    fontSize -= 1;
+    previewName.style.fontSize = `${fontSize}px`;
+  }
+}
+
 function renderPreview() {
   previewName.textContent = state.name.trim() || 'Name';
+  fitCardName();
 
   cardInner.style.background = `linear-gradient(135deg, ${state.color1}, ${state.color2})`;
 
@@ -219,6 +231,8 @@ function renderPreview() {
   }
 }
 renderPreview();
+window.addEventListener('resize', fitCardName);
+document.fonts.ready.then(fitCardName);
 
 function updateExportAvailability() {
   const ready = state.name.trim().length > 0;
@@ -302,16 +316,6 @@ function roundRectPath(ctx, x, y, w, h, r) {
   ctx.roundRect(x, y, w, h, r);
 }
 
-function wrapAndFitText(ctx, text, maxWidth, maxFontSize, fontFamily, weight) {
-  let fontSize = maxFontSize;
-  do {
-    ctx.font = `${weight} ${fontSize}px ${fontFamily}`;
-    if (ctx.measureText(text).width <= maxWidth || fontSize <= 24) break;
-    fontSize -= 2;
-  } while (true);
-  return fontSize;
-}
-
 function wrapTextLines(ctx, text, maxWidth, font) {
   ctx.font = font;
   const words = text.split(/\s+/).filter(Boolean);
@@ -329,6 +333,19 @@ function wrapTextLines(ctx, text, maxWidth, font) {
   }
   lines.push(current);
   return lines;
+}
+
+function fitNameLines(ctx, text, maxWidth, maxHeight, maxFontSize, minFontSize, fontFamily, weight) {
+  const lineHeightRatio = 1.08;
+  let fontSize = maxFontSize;
+  let lines = [text];
+  while (fontSize > minFontSize) {
+    const font = `${weight} ${fontSize}px ${fontFamily}`;
+    lines = wrapTextLines(ctx, text, maxWidth, font);
+    if (lines.length * fontSize * lineHeightRatio <= maxHeight) break;
+    fontSize -= 2;
+  }
+  return { fontSize, lines, lineHeight: fontSize * lineHeightRatio };
 }
 
 const STAT_LABEL_FONT = "700 37px 'Roboto'";
@@ -386,7 +403,7 @@ function drawStar(ctx, cx, cy, outerRadius, filled) {
 }
 
 async function exportCard() {
-  await document.fonts.load('700 82px "Baloo 2"');
+  await document.fonts.load('700 64px "Baloo 2"');
   await document.fonts.load('700 37px "Roboto"');
   await document.fonts.ready;
 
@@ -415,7 +432,7 @@ async function exportCard() {
   ctx.restore();
 
   const pad = 44;
-  const gap = 28;
+  const gap = 14;
   const contentX = innerX + pad;
   const contentW = innerW - pad * 2;
   let cursorY = innerY + pad;
@@ -423,8 +440,8 @@ async function exportCard() {
   const filledStats = state.stats.filter((s) => s.label.trim() || s.value.trim());
   const statsLayout = filledStats.length > 0 ? layoutStatRows(ctx, filledStats, contentW) : null;
 
-  const nameH = 165;
-  const starsH = 90;
+  const nameH = 125;
+  const starsH = 80;
   const statsH = statsLayout ? STAT_PAD_Y * 2 + statsLayout.totalHeight : 0;
   const bottomPad = innerY + innerH - pad;
   const gapsCount = filledStats.length > 0 ? 3 : 2;
@@ -435,12 +452,27 @@ async function exportCard() {
   ctx.fillStyle = 'rgba(255,255,255,0.94)';
   ctx.fill();
   const name = state.name.trim() || 'Name';
-  const fontSize = wrapAndFitText(ctx, name, contentW - 60, 82, "'Baloo 2'", 700);
-  ctx.font = `700 ${fontSize}px 'Baloo 2'`;
+  const namePad = 20;
+  const { fontSize: nameFontSize, lines: nameLines, lineHeight: nameLineHeight } = fitNameLines(
+    ctx,
+    name,
+    contentW - 60,
+    nameH - namePad * 2,
+    64,
+    22,
+    "'Baloo 2'",
+    700
+  );
+  ctx.font = `700 ${nameFontSize}px 'Baloo 2'`;
   ctx.fillStyle = '#3A2F5B';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(name, contentX + contentW / 2, cursorY + nameH / 2 + 4);
+  const nameTextHeight = nameLines.length * nameLineHeight;
+  let nameLineY = cursorY + nameH / 2 - nameTextHeight / 2 + nameLineHeight / 2;
+  nameLines.forEach((line) => {
+    ctx.fillText(line, contentX + contentW / 2, nameLineY);
+    nameLineY += nameLineHeight;
+  });
   cursorY += nameH + gap;
 
   // --- Image frame ---
@@ -508,11 +540,31 @@ async function exportCard() {
 
   // --- Stars ---
   const starCount = 5;
-  const starSize = 34;
-  const starGap = 26;
-  const totalStarsW = starCount * starSize * 2 + (starCount - 1) * starGap;
-  let starX = contentX + contentW / 2 - totalStarsW / 2 + starSize;
+  const starSize = 30;
+  const starGap = 22;
   const starCenterY = cursorY + starsH / 2;
+
+  const rarityLabel = 'SELTENHEIT';
+  const rarityFont = "700 26px 'Roboto'";
+  ctx.font = rarityFont;
+  const rarityLabelWidth = ctx.measureText(rarityLabel).width;
+  const rarityGap = 18;
+
+  const totalStarsW = starCount * starSize * 2 + (starCount - 1) * starGap;
+  const totalRowW = rarityLabelWidth + rarityGap + totalStarsW;
+  let cursorX = contentX + contentW / 2 - totalRowW / 2;
+
+  ctx.font = rarityFont;
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0,0,0,0.45)';
+  ctx.shadowBlur = 4;
+  ctx.fillText(rarityLabel, cursorX, starCenterY);
+  ctx.shadowBlur = 0;
+  cursorX += rarityLabelWidth + rarityGap;
+
+  let starX = cursorX + starSize;
   for (let i = 0; i < starCount; i++) {
     drawStar(ctx, starX, starCenterY, starSize, i < state.rating);
     starX += starSize * 2 + starGap;

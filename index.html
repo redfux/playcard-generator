@@ -24,7 +24,7 @@
 
       <div class="form-card">
         <h2><span class="material-symbols-outlined">badge</span>Name</h2>
-        <input id="nameInput" class="text-input" type="text" maxlength="18" placeholder="Wie heißt deine Figur?">
+        <input id="nameInput" class="text-input" type="text" maxlength="28" placeholder="Wie heißt deine Figur?">
       </div>
 
       <div class="form-card">
@@ -74,7 +74,10 @@
             <span class="material-symbols-outlined placeholder-icon" id="previewPlaceholder">image</span>
           </div>
           <div class="card-stats" id="previewStats"></div>
-          <div class="card-stars" id="previewStars"></div>
+          <div class="card-stars-row">
+            <span class="card-stars-label">Seltenheit</span>
+            <div class="card-stars" id="previewStars"></div>
+          </div>
         </div>
       </div>
       <button id="exportBtn" class="btn btn-primary btn-large" type="button" disabled>
