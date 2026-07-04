@@ -4,6 +4,9 @@ Eine kleine, kindgerechte Web-App, mit der man eigene Spielkarten im Stil von
 Pokémon-Sammelkarten erstellen und als JPG exportieren kann. Läuft komplett
 im Browser, ohne Server-Backend.
 
+**Live:** https://redfux.github.io/playcard-generator/ (gehostet via GitHub
+Pages, wird bei jedem Push auf `main` automatisch aktualisiert)
+
 ## Funktionen
 
 - **Name** (Pflichtfeld, bis zu 28 Zeichen) – steht oben auf der Karte in
