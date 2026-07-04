@@ -123,10 +123,14 @@ body {
 /* Stats list */
 .stat-row {
   display: flex;
+  flex-direction: column;
   gap: 8px;
-  align-items: center;
-  margin-bottom: 10px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--md-surface-variant);
 }
+.stat-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.stat-row-top { display: flex; gap: 8px; align-items: center; }
 .stat-row input {
   font-family: inherit;
   font-size: 1rem;
@@ -135,9 +139,10 @@ body {
   border: 2px solid var(--md-outline);
   background: var(--md-surface);
   color: var(--md-on-surface);
+  width: 100%;
 }
-.stat-row .stat-label { flex: 1.2; min-width: 0; }
-.stat-row .stat-value { flex: 1; min-width: 0; }
+.stat-row-top .stat-label { flex: 1; min-width: 0; }
+.stat-row .stat-value { min-width: 0; }
 .stat-row .remove-stat {
   background: transparent;
   border: none;
@@ -226,7 +231,7 @@ body {
   text-align: center;
   font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
-  font-size: clamp(0.9rem, 5.2vw, 1.4rem);
+  font-size: clamp(1rem, 6vw, 1.6rem);
   color: #3a2f5b;
   word-break: break-word;
   box-shadow: 0 1px 3px rgba(0,0,0,.15);
@@ -260,14 +265,20 @@ body {
   display: flex;
   justify-content: space-between;
   gap: 8px;
-  font-size: clamp(0.6rem, 3.2vw, 0.85rem);
+  font-size: clamp(0.66rem, 3.52vw, 0.935rem);
   color: #3a2f5b;
   border-bottom: 1px solid rgba(0,0,0,.08);
   padding-bottom: 2%;
 }
 .stat-display-row:last-child { border-bottom: none; padding-bottom: 0; }
-.stat-display-row .stat-display-label { font-weight: 700; }
-.stat-display-row .stat-display-value { font-weight: 400; text-align: right; }
+.stat-display-row .stat-display-label { font-weight: 700; flex: 0 1 42%; min-width: 0; }
+.stat-display-row .stat-display-value {
+  font-weight: 400;
+  text-align: right;
+  flex: 1 1 auto;
+  min-width: 0;
+  word-break: break-word;
+}
 
 .card-stars {
   display: flex;
@@ -276,10 +287,14 @@ body {
 }
 .card-stars .material-symbols-outlined {
   font-size: clamp(1rem, 5.5vw, 1.6rem);
-  color: rgba(255,255,255,.6);
+  color: rgba(255,255,255,.75);
+  font-variation-settings: 'FILL' 0;
+  -webkit-text-stroke: 1px rgba(0,0,0,.55);
+  paint-order: stroke fill;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.45));
 }
 .card-stars .material-symbols-outlined.filled {
-  color: #FFB300;
+  color: #FFC107;
   font-variation-settings: 'FILL' 1;
 }
 

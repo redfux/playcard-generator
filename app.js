@@ -124,8 +124,8 @@ function renderStatsRows() {
 
     const valueInput = document.createElement('input');
     valueInput.className = 'stat-value';
-    valueInput.placeholder = 'z.B. 100';
-    valueInput.maxLength = 12;
+    valueInput.placeholder = 'z.B. 100 oder ein Feuerball, der 3 Runden brennt';
+    valueInput.maxLength = 50;
     valueInput.value = stat.value;
     valueInput.addEventListener('input', () => {
       state.stats[index].value = valueInput.value;
@@ -143,7 +143,11 @@ function renderStatsRows() {
       renderPreview();
     });
 
-    row.append(labelInput, valueInput, removeBtn);
+    const topRow = document.createElement('div');
+    topRow.className = 'stat-row-top';
+    topRow.append(labelInput, removeBtn);
+
+    row.append(topRow, valueInput);
     statsListEl.appendChild(row);
   });
 
@@ -308,6 +312,53 @@ function wrapAndFitText(ctx, text, maxWidth, maxFontSize, fontFamily, weight) {
   return fontSize;
 }
 
+function wrapTextLines(ctx, text, maxWidth, font) {
+  ctx.font = font;
+  const words = text.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return [''];
+  const lines = [];
+  let current = words[0];
+  for (let i = 1; i < words.length; i++) {
+    const test = `${current} ${words[i]}`;
+    if (ctx.measureText(test).width > maxWidth) {
+      lines.push(current);
+      current = words[i];
+    } else {
+      current = test;
+    }
+  }
+  lines.push(current);
+  return lines;
+}
+
+const STAT_LABEL_FONT = "700 37px 'Roboto'";
+const STAT_VALUE_FONT = "400 37px 'Roboto'";
+const STAT_LINE_HEIGHT = 46;
+const STAT_INLINE_GAP = 24;
+const STAT_PAD_X = 36;
+const STAT_PAD_Y = 22;
+const STAT_ROW_GAP = 12;
+
+function layoutStatRows(ctx, filledStats, contentW) {
+  const availW = contentW - STAT_PAD_X * 2;
+  const rows = filledStats.map((s) => {
+    const label = s.label.trim();
+    const value = s.value.trim();
+    ctx.font = STAT_LABEL_FONT;
+    const labelWidth = ctx.measureText(label).width;
+    ctx.font = STAT_VALUE_FONT;
+    const valueWidth = ctx.measureText(value).width;
+    const sameLineAvail = availW - labelWidth - STAT_INLINE_GAP;
+    if (value === '' || valueWidth <= sameLineAvail) {
+      return { label, valueLines: [value], inline: true, height: STAT_LINE_HEIGHT };
+    }
+    const valueLines = wrapTextLines(ctx, value, availW, STAT_VALUE_FONT);
+    return { label, valueLines, inline: false, height: STAT_LINE_HEIGHT * (1 + valueLines.length) };
+  });
+  const totalHeight = rows.reduce((sum, r) => sum + r.height, 0) + (rows.length - 1) * STAT_ROW_GAP;
+  return { rows, totalHeight };
+}
+
 function drawStar(ctx, cx, cy, outerRadius, filled) {
   const innerRadius = outerRadius * 0.45;
   const spikes = 5;
@@ -327,13 +378,16 @@ function drawStar(ctx, cx, cy, outerRadius, filled) {
   }
   ctx.lineTo(cx, cy - outerRadius);
   ctx.closePath();
-  ctx.fillStyle = filled ? '#FFB300' : '#D9D3E0';
+  ctx.fillStyle = filled ? '#FFC107' : '#D9D3E0';
   ctx.fill();
+  ctx.lineWidth = outerRadius * 0.12;
+  ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+  ctx.stroke();
 }
 
 async function exportCard() {
-  await document.fonts.load('700 60px "Baloo 2"');
-  await document.fonts.load('700 36px "Roboto"');
+  await document.fonts.load('700 82px "Baloo 2"');
+  await document.fonts.load('700 37px "Roboto"');
   await document.fonts.ready;
 
   const canvas = document.createElement('canvas');
@@ -367,21 +421,21 @@ async function exportCard() {
   let cursorY = innerY + pad;
 
   const filledStats = state.stats.filter((s) => s.label.trim() || s.value.trim());
+  const statsLayout = filledStats.length > 0 ? layoutStatRows(ctx, filledStats, contentW) : null;
 
-  const nameH = 150;
+  const nameH = 165;
   const starsH = 90;
-  const statsRowH = 78;
-  const statsH = filledStats.length > 0 ? 36 + filledStats.length * statsRowH : 0;
+  const statsH = statsLayout ? STAT_PAD_Y * 2 + statsLayout.totalHeight : 0;
   const bottomPad = innerY + innerH - pad;
   const gapsCount = filledStats.length > 0 ? 3 : 2;
-  const imageH = bottomPad - cursorY - nameH - starsH - statsH - gap * gapsCount;
+  const imageH = Math.max(120, bottomPad - cursorY - nameH - starsH - statsH - gap * gapsCount);
 
   // --- Name banner ---
   roundRectPath(ctx, contentX, cursorY, contentW, nameH, 22);
   ctx.fillStyle = 'rgba(255,255,255,0.94)';
   ctx.fill();
   const name = state.name.trim() || 'Name';
-  const fontSize = wrapAndFitText(ctx, name, contentW - 60, 72, "'Baloo 2'", 700);
+  const fontSize = wrapAndFitText(ctx, name, contentW - 60, 82, "'Baloo 2'", 700);
   ctx.font = `700 ${fontSize}px 'Baloo 2'`;
   ctx.fillStyle = '#3A2F5B';
   ctx.textAlign = 'center';
@@ -411,34 +465,43 @@ async function exportCard() {
   cursorY += imageH + gap;
 
   // --- Stats panel ---
-  if (filledStats.length > 0) {
+  if (statsLayout) {
     roundRectPath(ctx, contentX, cursorY, contentW, statsH, 22);
     ctx.fillStyle = 'rgba(255,255,255,0.94)';
     ctx.fill();
 
-    const statsPadX = 36;
-    let rowY = cursorY + 18;
-    filledStats.forEach((s, i) => {
-      const rowCenterY = rowY + statsRowH / 2;
-      ctx.font = `700 34px 'Roboto'`;
-      ctx.fillStyle = '#3A2F5B';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(s.label.trim(), contentX + statsPadX, rowCenterY, contentW * 0.55);
+    ctx.fillStyle = '#3A2F5B';
+    ctx.textBaseline = 'middle';
+    let rowY = cursorY + STAT_PAD_Y;
+    statsLayout.rows.forEach((row, i) => {
+      if (row.inline) {
+        const rowCenterY = rowY + row.height / 2;
+        ctx.font = STAT_LABEL_FONT;
+        ctx.textAlign = 'left';
+        ctx.fillText(row.label, contentX + STAT_PAD_X, rowCenterY);
+        ctx.font = STAT_VALUE_FONT;
+        ctx.textAlign = 'right';
+        ctx.fillText(row.valueLines[0], contentX + contentW - STAT_PAD_X, rowCenterY);
+      } else {
+        ctx.font = STAT_LABEL_FONT;
+        ctx.textAlign = 'left';
+        ctx.fillText(row.label, contentX + STAT_PAD_X, rowY + STAT_LINE_HEIGHT / 2);
+        ctx.font = STAT_VALUE_FONT;
+        row.valueLines.forEach((line, li) => {
+          const lineY = rowY + STAT_LINE_HEIGHT * (1 + li) + STAT_LINE_HEIGHT / 2;
+          ctx.fillText(line, contentX + STAT_PAD_X, lineY);
+        });
+      }
 
-      ctx.font = `400 34px 'Roboto'`;
-      ctx.textAlign = 'right';
-      ctx.fillText(s.value.trim(), contentX + contentW - statsPadX, rowCenterY, contentW * 0.4);
-
-      if (i < filledStats.length - 1) {
+      if (i < statsLayout.rows.length - 1) {
         ctx.strokeStyle = 'rgba(0,0,0,0.1)';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(contentX + statsPadX, rowY + statsRowH);
-        ctx.lineTo(contentX + contentW - statsPadX, rowY + statsRowH);
+        ctx.moveTo(contentX + STAT_PAD_X, rowY + row.height + STAT_ROW_GAP / 2);
+        ctx.lineTo(contentX + contentW - STAT_PAD_X, rowY + row.height + STAT_ROW_GAP / 2);
         ctx.stroke();
       }
-      rowY += statsRowH;
+      rowY += row.height + STAT_ROW_GAP;
     });
     cursorY += statsH + gap;
   }
