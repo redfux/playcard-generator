@@ -1,5 +1,7 @@
 // thought up by human, created by ai
 
+const APP_VERSION = '1.0.0';
+
 // ---------- State ----------
 const MAX_STATS = 5;
 
@@ -62,6 +64,8 @@ const zoomRange = document.getElementById('zoomRange');
 let cropper = null;
 
 // ---------- Init ----------
+document.getElementById('appVersion').textContent = `v${APP_VERSION}`;
+
 color1Input.value = state.color1;
 color2Input.value = state.color2;
 

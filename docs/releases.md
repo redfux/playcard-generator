@@ -4,6 +4,23 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/). Rückwirkend aus der
 Git-Historie rekonstruiert.
 
+## [1.0.0]
+
+### Added
+- Aktuelle App-Version wird in der Footer-Zeile angezeigt
+  (`APP_VERSION`-Konstante in `app.js`).
+
+### Changed
+- Erste als "1.0" gekennzeichnete Version (explizite Anweisung, siehe
+  Masterprompt-Regel: MAJOR wird nur auf ausdrücklichen Wunsch erhöht).
+
+## [0.6.1]
+
+### Added
+- Hinweis "thought up by human, created by ai" als Kommentar am Anfang von
+  `index.html`, `styles.css` und `app.js` sowie als dezente Fußzeile in der
+  Benutzeroberfläche.
+
 ## [0.6.0]
 
 ### Added
