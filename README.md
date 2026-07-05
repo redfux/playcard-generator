@@ -24,8 +24,13 @@ Pages, wird bei jedem Push auf `main` automatisch aktualisiert)
   "Seltenheit".
 - **Hintergrund** – frei wählbarer Farbverlauf, entweder über 8 Vorlagen-Verläufe
   oder zwei eigene Farben (Color-Picker).
+- **Rückseite** (optional) – Auswahl zwischen "Keine", "Normal" und "Golden"
+  (zwei fest hinterlegte Bild-Vorlagen). Wird eine Rückseite gewählt, hängt
+  der Export sie direkt rechts neben das Kartenbild – in exakt gleicher
+  Größe, damit man beides in einem Stück ausschneiden, einmal in der Mitte
+  falten und zusammenkleben kann.
 - **Export** – Export der fertigen Karte als JPG in Druckqualität, passend
-  zur physischen Kartengröße von **5,5 × 8 cm**.
+  zur physischen Kartengröße von **6,2 × 9 cm**.
 - **Responsive & barrierearm** – nutzbar auf Handy und PC, großzügige
   Touch-Ziele und einfache Sprache für Kinder ab ca. 9 Jahren, Look & Feel
   angelehnt an Google Material Design.
@@ -49,7 +54,9 @@ playcard-generator/
 ├── index.html   Seitenstruktur (Formular + Kartenvorschau + Zuschneide-Dialog)
 ├── styles.css   Material-Design-Styling, responsive Layout
 ├── app.js       App-Logik: Formular, Live-Vorschau, Bildzuschnitt, JPG-Export
-└── assets/      (aktuell ungenutzt, für zukünftige statische Assets)
+└── assets/
+    ├── back-normal.jpeg   Kartenrückseite "Normal" (62×90mm-Format)
+    └── back-gold.jpeg     Kartenrückseite "Golden" (62×90mm-Format)
 ```
 
 ## Lokal starten
@@ -72,8 +79,8 @@ Die Karte wird an zwei Stellen unabhängig voneinander gerendert:
    bei jeder Eingabe über `renderPreview()` in `app.js`. Nutzt `flexbox`,
    `clamp()` für responsive Schriftgrößen und CSS-Gradients.
 2. **JPG-Export (Canvas)** – `exportCard()` in `app.js` zeichnet die Karte
-   pixelgenau auf ein `<canvas>` (1100 × 1600 px, entspricht 5,5 × 8 cm bei
-   sehr hoher Druckauflösung) und lädt sie als JPG herunter.
+   pixelgenau auf ein `<canvas>` (1240 × 1800 px, entspricht 6,2 × 9 cm bei
+   20 px/mm Druckauflösung) und lädt sie als JPG herunter.
 
 Beide Renderer teilen sich dieselben Daten (`state`-Objekt), aber nicht denselben
 Zeichencode – Anpassungen an Layout/Größen müssen daher i. d. R. an **beiden**
@@ -100,6 +107,29 @@ im DOM) und brechen auf mehrere Zeilen um; die Zeilenhöhe jeder
 Eigenschaften-Zeile passt sich automatisch an, ohne dass Text abgeschnitten
 wird.
 
+### Rückseite anhängen
+
+`state.cardBack` speichert `'none'`, `'normal'` oder `'gold'` (Auswahl über
+die Vorschau-Kacheln in `#backPresets`, verkabelt in `app.js`). Beim Export
+zeichnet `exportCard()` die Vorderseite wie bisher auf ein Canvas in
+Kartengröße; `appendCardBack()` prüft danach, ob eine Rückseite gewählt ist:
+
+- **Keine** (`state.cardBack === 'none'`): Die Funktion gibt das
+  Vorderseiten-Canvas unverändert zurück – am bisherigen Export ändert sich
+  nichts.
+- **Normal/Golden**: Es wird ein neues, doppelt so breites Canvas erzeugt.
+  Die Vorderseite wird unverändert links hineingezeichnet, das gewählte
+  Rückseitenbild (`assets/back-normal.jpeg` bzw. `assets/back-gold.jpeg`)
+  wird direkt angrenzend rechts hineingezeichnet – ohne Spiegelung, da beim
+  Falten entlang der senkrechten Mittelachse (bedruckte Seite nach außen
+  gefaltet, Rückseiten der Blätter verklebt) die Rückseite dadurch beim
+  Umdrehen der fertigen Karte automatisch richtig herum erscheint.
+- Die Rückseitenbilder sind bereits exakt im Kartenformat (62:90) angelegt
+  und werden deshalb 1:1 auf die Zielgröße gestreckt, ohne Zuschneiden oder
+  Verzerrung.
+- Es gibt bewusst **keine** Live-Vorschau der Rückseite auf der Karte – nur
+  die Auswahl-Kachel zeigt eine Miniaturansicht.
+
 ### Bekannte Stolpersteine (für künftige Änderungen)
 
 - **`[hidden]`-Attribut**: Wird in diesem Projekt global mit
@@ -118,7 +148,7 @@ wird.
 
 ## Kartengestaltung im Detail
 
-- **Format**: 5,5 × 8 cm (Seitenverhältnis 55:80)
+- **Format**: 6,2 × 9 cm (Seitenverhältnis 62:90)
 - **Aufbau von oben nach unten**: Name → Bild → Eigenschaften (optional) →
   "Seltenheit" mit 5-Sterne-Skala
 - **Rahmen**: weißer äußerer Kartenrand, darin der frei wählbare
@@ -126,6 +156,9 @@ wird.
 - **Max. Eigenschaften**: 5
 - **Zeichenlimits**: Name 28 Zeichen, Eigenschaft-Label 16 Zeichen,
   Eigenschaft-Wert 50 Zeichen
+- **Rückseite** (optional): "Normal" oder "Golden", exakt im Kartenformat
+  62:90 – wird beim Export direkt rechts an die Vorderseite angehängt, zum
+  Ausschneiden, einmal Falten und Kleben
 
 ## Browser-Voraussetzungen
 

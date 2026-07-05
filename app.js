@@ -8,6 +8,12 @@ const state = {
   color1: '#8EC5FC',
   color2: '#E0C3FC',
   imageDataUrl: null,
+  cardBack: 'none',
+};
+
+const CARD_BACK_IMAGES = {
+  normal: 'assets/back-normal.jpeg',
+  gold: 'assets/back-gold.jpeg',
 };
 
 const GRADIENT_PRESETS = [
@@ -29,6 +35,7 @@ const starPicker = document.getElementById('starPicker');
 const gradientPresetsEl = document.getElementById('gradientPresets');
 const color1Input = document.getElementById('color1');
 const color2Input = document.getElementById('color2');
+const backPresetsEl = document.getElementById('backPresets');
 
 const cameraBtn = document.getElementById('cameraBtn');
 const uploadBtn = document.getElementById('uploadBtn');
@@ -84,6 +91,20 @@ function updatePresetSelection() {
   });
 }
 updatePresetSelection();
+
+[...backPresetsEl.children].forEach((btn) => {
+  btn.addEventListener('click', () => {
+    state.cardBack = btn.dataset.back;
+    updateBackSelection();
+  });
+});
+
+function updateBackSelection() {
+  [...backPresetsEl.children].forEach((btn) => {
+    btn.classList.toggle('selected', btn.dataset.back === state.cardBack);
+  });
+}
+updateBackSelection();
 
 for (let i = 0; i < 5; i++) {
   const star = document.createElement('span');
@@ -307,8 +328,9 @@ cropConfirmBtn.addEventListener('click', () => {
 });
 
 // ---------- Export to JPG ----------
-const EXPORT_W = 1100;
-const EXPORT_H = 1600;
+// 62 x 90 mm card at 20px/mm for high print resolution.
+const EXPORT_W = 1240;
+const EXPORT_H = 1800;
 const BORDER = 34;
 
 function roundRectPath(ctx, x, y, w, h, r) {
@@ -570,7 +592,9 @@ async function exportCard() {
     starX += starSize * 2 + starGap;
   }
 
-  canvas.toBlob(
+  const finalCanvas = await appendCardBack(canvas);
+
+  finalCanvas.toBlob(
     (blob) => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -585,6 +609,22 @@ async function exportCard() {
     'image/jpeg',
     0.92
   );
+}
+
+async function appendCardBack(frontCanvas) {
+  const backSrc = CARD_BACK_IMAGES[state.cardBack];
+  if (!backSrc) return frontCanvas;
+
+  const backImg = await loadImage(backSrc);
+  const combined = document.createElement('canvas');
+  combined.width = EXPORT_W * 2;
+  combined.height = EXPORT_H;
+  const combinedCtx = combined.getContext('2d');
+  combinedCtx.drawImage(frontCanvas, 0, 0);
+  // Back artwork is already authored at the 62:90 card ratio, so it can be
+  // stretched to fill its half exactly without cropping or distortion.
+  combinedCtx.drawImage(backImg, EXPORT_W, 0, EXPORT_W, EXPORT_H);
+  return combined;
 }
 
 function loadImage(src) {
