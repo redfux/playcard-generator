@@ -354,7 +354,7 @@ body {
   padding-bottom: 0.35em;
 }
 .stat-display-row:last-child { border-bottom: none; padding-bottom: 0; }
-.stat-display-row .stat-display-label { font-weight: 700; flex: 0 1 42%; min-width: 0; }
+.stat-display-row .stat-display-label { font-weight: 700; flex: 0 1 42%; min-width: 0; word-break: break-word; }
 .stat-display-row .stat-display-value {
   font-weight: 400;
   text-align: right;

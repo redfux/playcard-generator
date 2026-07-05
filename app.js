@@ -135,7 +135,7 @@ function renderStatsRows() {
     const labelInput = document.createElement('input');
     labelInput.className = 'stat-label';
     labelInput.placeholder = 'z.B. Stärke';
-    labelInput.maxLength = 16;
+    labelInput.maxLength = 24;
     labelInput.value = stat.label;
     labelInput.addEventListener('input', () => {
       state.stats[index].label = labelInput.value;

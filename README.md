@@ -209,7 +209,7 @@ Kartengröße; `appendCardBack()` prüft danach, ob eine Rückseite gewählt ist
 - **Rahmen**: weißer äußerer Kartenrand, darin der frei wählbare
   Farbverlauf als Hintergrund
 - **Max. Eigenschaften**: 5
-- **Zeichenlimits**: Name 28 Zeichen, Eigenschaft-Label 16 Zeichen,
+- **Zeichenlimits**: Name 28 Zeichen, Eigenschaft-Label 24 Zeichen,
   Eigenschaft-Wert 50 Zeichen
 - **Rückseite** (optional): "Normal" oder "Golden", exakt im Kartenformat
   62:90 – wird beim Export direkt rechts an die Vorderseite angehängt, zum
