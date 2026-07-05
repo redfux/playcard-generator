@@ -1,3 +1,5 @@
+/* thought up by human, created by ai */
+
 /* Self-hosted fonts (originally served from Google Fonts CDN). Hosting the
    files ourselves avoids sending visitor IP addresses to Google's servers
    on every page view. Font files are unmodified, open-licensed (OFL/Apache)
@@ -73,6 +75,13 @@ body {
 }
 
 .app { min-height: 100vh; display: flex; flex-direction: column; }
+
+.app-footer {
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--md-outline);
+  padding: 10px 16px 18px;
+}
 
 .topbar {
   display: flex;

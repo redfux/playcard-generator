@@ -1,3 +1,5 @@
+// thought up by human, created by ai
+
 // ---------- State ----------
 const MAX_STATS = 5;
 
