@@ -1,2 +1,10 @@
 .claude/
 .DS_Store
+/Users/hannes.brade/Documents/Claude/epaper_weather/.gitignore
+
+# Masterprompt baseline exclusions
+node_modules/
+.env
+dist/
+build/
+.vscode/
