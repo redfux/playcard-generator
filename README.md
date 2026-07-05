@@ -40,8 +40,8 @@ Pages, wird bei jedem Push auf `main` automatisch aktualisiert)
 Bewusst einfach gehalten, kein Build-Prozess nötig:
 
 - **HTML/CSS/JavaScript** (Vanilla, keine Frameworks)
-- **[Cropper.js](https://github.com/fengyuanchen/cropperjs)** (CDN) für den
-  Bildzuschnitt
+- **[Cropper.js](https://github.com/fengyuanchen/cropperjs) 1.6.2** (MIT-Lizenz)
+  für den Bildzuschnitt – selbst gehostet unter `vendor/cropperjs/`, kein CDN
 - **Canvas API** für das Zusammensetzen der Karte und den JPG-Export
 - **Selbst gehostete Schriften** (siehe unten): "Baloo 2" (verspielte
   Überschriftenschrift für den Namen), "Roboto" (Fließtext) und "Material
@@ -60,6 +60,9 @@ playcard-generator/
 │   ├── baloo2-variable.woff2             Namens-/Überschriftenschrift
 │   ├── roboto-variable.woff2             Fließtext
 │   └── material-symbols-outlined.woff2   Icon-Schrift (inkl. FILL-Achse)
+├── vendor/cropperjs/
+│   ├── cropper.min.js    Cropper.js 1.6.2 (MIT), selbst gehostet statt CDN
+│   └── cropper.min.css
 └── assets/
     ├── back-normal.jpeg    Kartenrückseite "Normal" (62×90mm), nur für die Auswahl-Vorschau
     ├── back-gold.jpeg      Kartenrückseite "Golden" (62×90mm), nur für die Auswahl-Vorschau
@@ -114,29 +117,31 @@ im DOM) und brechen auf mehrere Zeilen um; die Zeilenhöhe jeder
 Eigenschaften-Zeile passt sich automatisch an, ohne dass Text abgeschnitten
 wird.
 
-### Selbst gehostete Schriften (kein Google-Server-Kontakt)
+### Selbst gehostete Ressourcen (kein Drittanbieter-Server-Kontakt)
 
-Die App lädt keine Ressourcen mehr von `fonts.googleapis.com` oder
-`fonts.gstatic.com` – dadurch wird beim Seitenaufruf keine Besucher-IP an
-Google übertragen (u. a. relevant wegen der DSGVO-Rechtsprechung zu extern
-eingebundenen Google Fonts). Stattdessen liegen die drei benötigten
-Schriftdateien lokal im `fonts/`-Ordner und werden per `@font-face` in
-`styles.css` eingebunden:
+Die App lädt zur Laufzeit **keine** Ressourcen mehr von externen Servern –
+weder von `fonts.googleapis.com`/`fonts.gstatic.com` noch von einem CDN für
+Cropper.js. Dadurch wird beim Seitenaufruf keine Besucher-IP an Dritte
+übertragen (u. a. relevant wegen der DSGVO-Rechtsprechung zu extern
+eingebundenen Google Fonts). Stattdessen liegen alle benötigten Dateien lokal
+im Projekt:
 
-- Es handelt sich um unveränderte, mit denselben Open-Source-Lizenzen
-  (SIL OFL bzw. Apache 2.0) weiterhin frei nutzbare Original-Dateien – die
-  Optik ist dadurch exakt identisch zur vorherigen Google-Fonts-Einbindung.
-- Alle drei sind **variable Fonts**: `baloo2-variable.woff2` deckt die
-  Schriftschnitte 500–800 ab, `roboto-variable.woff2` die Schnitte
-  400–700, `material-symbols-outlined.woff2` die FILL-Achse (0–1) für
-  leere/gefüllte Sterne. Ein einziges File pro Familie genügt daher.
-- Die Basis-Regel für `.material-symbols-outlined` (u. a.
-  `font-feature-settings: 'liga'`, die Text wie `star` per Ligatur in das
-  passende Icon-Glyph verwandelt) kam vorher aus Googles Stylesheet und ist
-  jetzt am Anfang von `styles.css` fest hinterlegt.
-- Nur [Cropper.js](https://github.com/fengyuanchen/cropperjs) kommt weiterhin
-  von einem externen CDN (cdnjs/Cloudflare, nicht Google) – falls auch das
-  entfallen soll, müsste die Bibliothek ebenfalls lokal eingebunden werden.
+- **Schriften** (`fonts/`, eingebunden per `@font-face` in `styles.css`):
+  Baloo 2, Roboto und Material Symbols Outlined liegen als unveränderte,
+  weiterhin frei lizenzierte (SIL OFL bzw. Apache 2.0) Original-Dateien
+  lokal – die Optik ist dadurch exakt identisch zur vorherigen
+  Google-Fonts-Einbindung.
+  - Alle drei sind **variable Fonts**: `baloo2-variable.woff2` deckt die
+    Schriftschnitte 500–800 ab, `roboto-variable.woff2` die Schnitte
+    400–700, `material-symbols-outlined.woff2` die FILL-Achse (0–1) für
+    leere/gefüllte Sterne. Ein einziges File pro Familie genügt daher.
+  - Die Basis-Regel für `.material-symbols-outlined` (u. a.
+    `font-feature-settings: 'liga'`, die Text wie `star` per Ligatur in das
+    passende Icon-Glyph verwandelt) kam vorher aus Googles Stylesheet und
+    ist jetzt am Anfang von `styles.css` fest hinterlegt.
+- **Cropper.js** (`vendor/cropperjs/`): unveränderte Version 1.6.2
+  (MIT-Lizenz), vorher von cdnjs/Cloudflare geladen, jetzt lokal
+  eingebunden über `<link>`/`<script>` in `index.html`.
 
 ### Rückseite anhängen
 
