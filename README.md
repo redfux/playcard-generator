@@ -55,8 +55,9 @@ playcard-generator/
 ├── styles.css   Material-Design-Styling, responsive Layout
 ├── app.js       App-Logik: Formular, Live-Vorschau, Bildzuschnitt, JPG-Export
 └── assets/
-    ├── back-normal.jpeg   Kartenrückseite "Normal" (62×90mm-Format)
-    └── back-gold.jpeg     Kartenrückseite "Golden" (62×90mm-Format)
+    ├── back-normal.jpeg    Kartenrückseite "Normal" (62×90mm), nur für die Auswahl-Vorschau
+    ├── back-gold.jpeg      Kartenrückseite "Golden" (62×90mm), nur für die Auswahl-Vorschau
+    └── card-backs-data.js  Dieselben beiden Bilder als Base64-Data-URLs für den Export
 ```
 
 ## Lokal starten
@@ -119,11 +120,23 @@ Kartengröße; `appendCardBack()` prüft danach, ob eine Rückseite gewählt ist
   nichts.
 - **Normal/Golden**: Es wird ein neues, doppelt so breites Canvas erzeugt.
   Die Vorderseite wird unverändert links hineingezeichnet, das gewählte
-  Rückseitenbild (`assets/back-normal.jpeg` bzw. `assets/back-gold.jpeg`)
-  wird direkt angrenzend rechts hineingezeichnet – ohne Spiegelung, da beim
-  Falten entlang der senkrechten Mittelachse (bedruckte Seite nach außen
-  gefaltet, Rückseiten der Blätter verklebt) die Rückseite dadurch beim
-  Umdrehen der fertigen Karte automatisch richtig herum erscheint.
+  Rückseitenbild wird direkt angrenzend rechts hineingezeichnet – ohne
+  Spiegelung, da beim Falten entlang der senkrechten Mittelachse (bedruckte
+  Seite nach außen gefaltet, Rückseiten der Blätter verklebt) die Rückseite
+  dadurch beim Umdrehen der fertigen Karte automatisch richtig herum
+  erscheint.
+- Für den Export wird **nicht** die Bilddatei aus `assets/` geladen, sondern
+  die identische Grafik als Base64-Data-URL aus
+  `assets/card-backs-data.js` (`CARD_BACK_DATA_URLS`). Grund: Ein per
+  Dateipfad nachgeladenes Bild gilt für den Browser als eigene Quelle und
+  "verunreinigt" (tainted) den Canvas, sobald die Seite über `file://`
+  (Doppelklick auf `index.html`) statt über einen Webserver geöffnet wird –
+  `canvas.toBlob()` bricht dann mit einem SecurityError ab. Data-URLs
+  umgehen dieses Problem grundsätzlich, unabhängig vom Aufruf-Weg. Die
+  `.jpeg`-Dateien in `assets/` bleiben trotzdem bestehen, da sie für die
+  Miniaturansichten in der Auswahl (`background-image` in `index.html`)
+  verwendet werden – dort tritt das Tainting-Problem nicht auf, weil dabei
+  nichts in einen Canvas gezeichnet wird.
 - Die Rückseitenbilder sind bereits exakt im Kartenformat (62:90) angelegt
   und werden deshalb 1:1 auf die Zielgröße gestreckt, ohne Zuschneiden oder
   Verzerrung.
@@ -132,6 +145,13 @@ Kartengröße; `appendCardBack()` prüft danach, ob eine Rückseite gewählt ist
 
 ### Bekannte Stolpersteine (für künftige Änderungen)
 
+- **Bilder im Canvas & `file://`**: Jedes Bild, das per Dateipfad (statt als
+  `data:`-URL) in ein `<canvas>` gezeichnet wird, muss beim Export
+  funktionieren – auch wenn `index.html` direkt per Doppelklick geöffnet
+  wird. Deshalb werden die Kartenrückseiten zusätzlich als Base64-Data-URLs
+  in `assets/card-backs-data.js` gepflegt (siehe "Rückseite anhängen").
+  Neue, für den Export benötigte Bild-Assets sollten demselben Muster
+  folgen.
 - **`[hidden]`-Attribut**: Wird in diesem Projekt global mit
   `[hidden] { display: none !important; }` abgesichert, weil einzelne
   Klassen (z. B. von Icon-Fonts) sonst `display` überschreiben und Elemente

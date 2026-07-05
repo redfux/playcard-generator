@@ -11,10 +11,9 @@ const state = {
   cardBack: 'none',
 };
 
-const CARD_BACK_IMAGES = {
-  normal: 'assets/back-normal.jpeg',
-  gold: 'assets/back-gold.jpeg',
-};
+// The actual image data lives in assets/card-backs-data.js (CARD_BACK_DATA_URLS),
+// embedded as base64 so the export canvas never gets cross-origin tainted —
+// this matters when index.html is opened via file:// instead of a server.
 
 const GRADIENT_PRESETS = [
   ['#8EC5FC', '#E0C3FC'],
@@ -612,7 +611,7 @@ async function exportCard() {
 }
 
 async function appendCardBack(frontCanvas) {
-  const backSrc = CARD_BACK_IMAGES[state.cardBack];
+  const backSrc = CARD_BACK_DATA_URLS[state.cardBack];
   if (!backSrc) return frontCanvas;
 
   const backImg = await loadImage(backSrc);
