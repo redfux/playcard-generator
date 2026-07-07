@@ -43,6 +43,8 @@ Danach die Seite unter `http://localhost:3457` öffnen.
 - [`docs/architecture.md`](docs/architecture.md) – Technik-Stack,
   Projektstruktur, Architekturentscheidungen
 - [`docs/bugs.md`](docs/bugs.md) – gefundene Bugs & deren Lösung
+- [`docs/feature-requests.md`](docs/feature-requests.md) – besprochene, aber
+  noch nicht umgesetzte Ideen
 - [`docs/releases.md`](docs/releases.md) – Changelog
 - [`docs/THIRD_PARTY_LICENSES.md`](docs/THIRD_PARTY_LICENSES.md) – Lizenzen
   eingebetteter Schriften/Bibliotheken
