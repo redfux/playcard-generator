@@ -22,8 +22,9 @@ Pages, wird bei jedem Push auf `main` automatisch aktualisiert)
   Export in identischer Größe direkt neben die Vorderseite gesetzt, zum
   Ausschneiden, Falten und Kleben.
 - **Export** – JPG in Druckqualität, Kartenformat 6,2 × 9 cm. Zusätzlich als
-  PDF-Druckbogen (A4, 1–9 Kopien im Raster, korrekte physische Größe – wichtig,
-  weil der normale Handy-Druckdialog Bilder sonst auf die ganze Seite zieht).
+  PDF-Druckbogen (A4, korrekte physische Größe – wichtig, weil der normale
+  Handy-Druckdialog Bilder sonst auf die ganze Seite zieht): 9 Karten ohne
+  bzw. 4 Karten (quer gedreht) mit gewählter Rückseite.
 - **Responsive & barrierearm** – nutzbar auf Handy und PC, für Kinder ab ca.
   9 Jahren, Look & Feel angelehnt an Google Material Design.
 

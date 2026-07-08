@@ -1,6 +1,6 @@
 // thought up by human, created by ai
 
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.2.0';
 
 // ---------- State ----------
 const MAX_STATS = 5;
@@ -54,8 +54,8 @@ const previewStars = document.getElementById('previewStars');
 
 const exportBtn = document.getElementById('exportBtn');
 const exportHint = document.getElementById('exportHint');
-const pdfCopyCountSelect = document.getElementById('pdfCopyCount');
 const exportPdfBtn = document.getElementById('exportPdfBtn');
+const pdfHint = document.getElementById('pdfHint');
 
 const cropperModal = document.getElementById('cropperModal');
 const cropperImage = document.getElementById('cropperImage');
@@ -110,6 +110,10 @@ function updateBackSelection() {
   [...backPresetsEl.children].forEach((btn) => {
     btn.classList.toggle('selected', btn.dataset.back === state.cardBack);
   });
+  pdfHint.textContent =
+    state.cardBack === 'none'
+      ? '9 Karten pro A4-Blatt'
+      : '4 Karten pro A4-Blatt (inkl. Rückseite, quer gedreht)';
 }
 updateBackSelection();
 
@@ -631,39 +635,62 @@ const A4_WIDTH_MM = 210;
 const A4_HEIGHT_MM = 297;
 const PRINT_SHEET_GAP_MM = 6;
 
-async function exportPdfSheet() {
-  const count = parseInt(pdfCopyCountSelect.value, 10);
-  const canvas = await renderCardCanvas();
-  const imgData = canvas.toDataURL('image/jpeg', 0.92);
+function rotateCanvas90(sourceCanvas) {
+  const rotated = document.createElement('canvas');
+  rotated.width = sourceCanvas.height;
+  rotated.height = sourceCanvas.width;
+  const ctx = rotated.getContext('2d');
+  ctx.translate(rotated.width / 2, rotated.height / 2);
+  ctx.rotate(Math.PI / 2);
+  ctx.drawImage(sourceCanvas, -sourceCanvas.width / 2, -sourceCanvas.height / 2);
+  return rotated;
+}
 
-  const cols = Math.min(3, count);
-  const rows = Math.ceil(count / cols);
-  const gridW = cols * CARD_WIDTH_MM + (cols - 1) * PRINT_SHEET_GAP_MM;
-  const gridH = rows * CARD_HEIGHT_MM + (rows - 1) * PRINT_SHEET_GAP_MM;
+function drawPrintGrid(doc, imgData, cols, rows, unitW, unitH) {
+  const gridW = cols * unitW + (cols - 1) * PRINT_SHEET_GAP_MM;
+  const gridH = rows * unitH + (rows - 1) * PRINT_SHEET_GAP_MM;
   const offsetX = (A4_WIDTH_MM - gridW) / 2;
   const offsetY = (A4_HEIGHT_MM - gridH) / 2;
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const x = offsetX + col * (unitW + PRINT_SHEET_GAP_MM);
+      const y = offsetY + row * (unitH + PRINT_SHEET_GAP_MM);
+      doc.addImage(imgData, 'JPEG', x, y, unitW, unitH);
+    }
+  }
+
+  // Dashed cut guides through the middle of each gap between units.
+  doc.setDrawColor(180);
+  doc.setLineDashPattern([1.5, 1.5], 0);
+  for (let c = 1; c < cols; c++) {
+    const x = offsetX + c * unitW + (c - 0.5) * PRINT_SHEET_GAP_MM;
+    doc.line(x, offsetY, x, offsetY + gridH);
+  }
+  for (let r = 1; r < rows; r++) {
+    const y = offsetY + r * unitH + (r - 0.5) * PRINT_SHEET_GAP_MM;
+    doc.line(offsetX, y, offsetX + gridW, y);
+  }
+}
+
+async function exportPdfSheet() {
+  const canvas = await renderCardCanvas();
+  const hasBack = Boolean(CARD_BACK_DATA_URLS[state.cardBack]);
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
-  for (let i = 0; i < count; i++) {
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-    const x = offsetX + col * (CARD_WIDTH_MM + PRINT_SHEET_GAP_MM);
-    const y = offsetY + row * (CARD_HEIGHT_MM + PRINT_SHEET_GAP_MM);
-    doc.addImage(imgData, 'JPEG', x, y, CARD_WIDTH_MM, CARD_HEIGHT_MM);
-  }
-
-  // Dashed cut guides through the middle of each gap between cards.
-  doc.setDrawColor(180);
-  doc.setLineDashPattern([1.5, 1.5], 0);
-  for (let c = 1; c < cols; c++) {
-    const x = offsetX + c * CARD_WIDTH_MM + (c - 0.5) * PRINT_SHEET_GAP_MM;
-    doc.line(x, offsetY, x, offsetY + gridH);
-  }
-  for (let r = 1; r < rows; r++) {
-    const y = offsetY + r * CARD_HEIGHT_MM + (r - 0.5) * PRINT_SHEET_GAP_MM;
-    doc.line(offsetX, y, offsetX + gridW, y);
+  if (hasBack) {
+    // Front+back side by side is a 124x90mm landscape unit; rotated 90°
+    // it becomes 90x124mm, so 2x2 = 4 units fit on a portrait A4 sheet
+    // (a 3x3 grid of the wider unrotated unit would only fit 1 column).
+    const combinedCanvas = await appendCardBack(canvas);
+    const rotatedCanvas = rotateCanvas90(combinedCanvas);
+    const imgData = rotatedCanvas.toDataURL('image/jpeg', 0.92);
+    drawPrintGrid(doc, imgData, 2, 2, CARD_HEIGHT_MM, CARD_WIDTH_MM * 2);
+  } else {
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    drawPrintGrid(doc, imgData, 3, 3, CARD_WIDTH_MM, CARD_HEIGHT_MM);
   }
 
   const safeName = (state.name.trim() || 'karte').replace(/[^a-z0-9äöüß_-]+/gi, '_');

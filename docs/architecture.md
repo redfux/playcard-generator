@@ -182,21 +182,32 @@ gängigen PDF-Renderern korrekt in Originalgröße gedruckt, sofern beim Drucken
   Kartenvorderseite und ist von `exportCard()` (JPG) und `exportPdfSheet()`
   (PDF) gemeinsam genutzt – beide Export-Wege bleiben dadurch garantiert
   pixelidentisch.
-- `exportPdfSheet()` erzeugt ein A4-PDF (`jsPDF`, portrait, Einheit `mm`) und
-  platziert die gewählte Anzahl (1–9, per Dropdown) Kopien der Karte in
-  einem Raster mit maximal 3 Spalten/Zeilen (mehr passt bei 62×90 mm nicht
-  verzerrungsfrei auf A4: `floor(210/62) = 3`, `floor(297/90) = 3`). Das
-  Raster wird auf der Seite zentriert, dünne gestrichelte Linien markieren
-  die Schnittkanten zwischen den Karten.
+- `exportPdfSheet()` erzeugt ein A4-PDF (`jsPDF`, portrait, Einheit `mm`).
+  Die Anzahl ist bewusst **nicht** frei wählbar (weniger Entscheidungen für
+  die Zielgruppe Kinder), sondern richtet sich automatisch danach, ob eine
+  Kartenrückseite gewählt ist:
+  - **Keine Rückseite**: 3×3-Raster (9 Karten) der einzelnen
+    Kartenvorderseite bei 62×90 mm – mehr passt bei dieser Kartengröße
+    nicht verzerrungsfrei auf A4 (`floor(210/62) = 3`,
+    `floor(297/90) = 3`).
+  - **Mit Rückseite**: Die Vorderseite+Rückseite-Kombination
+    (`appendCardBack()`, 124×90 mm im Querformat) wird per
+    `rotateCanvas90()` um 90° gedreht (→ 90×124 mm im Hochformat) und in
+    einem 2×2-Raster (4 Einheiten) platziert – gedreht passen 2 Einheiten
+    pro Zeile auf die 210 mm Breite (`floor(210/90) = 2`), ungedreht nur 1
+    (`floor(210/124) = 1`). Die Drehrichtung selbst ist beliebig: Nach dem
+    Ausschneiden dreht man das Papierstück ohnehin von Hand in die
+    gewünschte Ausrichtung, bevor man es in der Mitte faltet.
+  - Beide Fälle nutzen dieselbe Hilfsfunktion `drawPrintGrid()` (Spalten,
+    Zeilen, Einheitsgröße als Parameter), inkl. zentriertem Raster und
+    dünnen gestrichelten Schnittlinien zwischen den Einheiten.
+  - Ein Hinweistext unter dem Button (`#pdfHint`) zeigt die jeweils
+    aktuell geltende Stückzahl an, aktualisiert in `updateBackSelection()`.
 - `CARD_WIDTH_MM`/`CARD_HEIGHT_MM` sind die einzige Quelle der Wahrheit für
   die physische Kartengröße – sowohl die JPG-Export-Canvas-Auflösung
-  (`EXPORT_W`/`EXPORT_H`, abgeleitet über `PX_PER_MM`) als auch die
-  PDF-Platzierung rechnen von diesen zwei Werten ab, damit beide Formate
-  nie auseinanderlaufen können.
-- **Bewusste Einschränkung der ersten Version**: Es wird immer nur die
-  Kartenvorderseite gedruckt, unabhängig von einer gewählten Rückseite
-  ("Normal"/"Golden"). Das hält die erste Version einfach; siehe
-  `feature-requests.md` für die Überlegung, das später zu erweitern.
+  (`EXPORT_W`/`EXPORT_H`, abgeleitet über `PX_PER_MM`) als auch beide
+  PDF-Raster rechnen von diesen zwei Werten ab, damit alle Formate nie
+  auseinanderlaufen können.
 
 ## Bekannte Stolpersteine (für künftige Änderungen)
 

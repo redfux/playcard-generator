@@ -412,28 +412,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 10px;
+  gap: 8px;
   margin-top: 8px;
   padding-top: 16px;
   border-top: 1px solid var(--md-surface-variant);
 }
-.pdf-export label {
-  font-size: .9rem;
-  font-weight: 500;
-  color: var(--md-on-surface-muted);
-  text-align: center;
-}
-.pdf-export select {
-  width: 100%;
-  font-size: 1.1rem;
-  font-family: inherit;
-  padding: 12px 14px;
-  border-radius: var(--radius-m);
-  border: 2px solid var(--md-outline);
-  background: var(--md-surface);
-  color: var(--md-on-surface);
-}
-.pdf-export select:focus { outline: none; border-color: var(--md-primary); }
 
 /* ---------- Cropper modal ---------- */
 .photo-crop-overlay {

@@ -4,6 +4,20 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/). Rückwirkend aus der
 Git-Historie rekonstruiert.
 
+## [1.2.0]
+
+### Added
+- PDF-Druckbogen enthält jetzt auch die Kartenrückseite, falls gewählt:
+  Vorder-/Rückseiten-Einheit wird um 90° gedreht und im 2×2-Raster (4
+  Stück) auf A4 platziert, statt wie bisher ignoriert zu werden.
+
+### Changed
+- Die frei wählbare Kopienanzahl (1–9) wurde entfernt – zu viele
+  Einstellungen für die Zielgruppe Kinder. Stattdessen feste Stückzahl je
+  nach Rückseiten-Auswahl: 9 Karten (3×3, ohne Rückseite) bzw. 4 Karten
+  (2×2, quer gedreht, mit Rückseite). Ein Hinweistext zeigt die jeweils
+  geltende Anzahl an.
+
 ## [1.1.0]
 
 ### Added

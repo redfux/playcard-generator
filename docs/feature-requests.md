@@ -30,18 +30,18 @@ Geprüfte, verworfene Alternativen:
 - Drittanbieter-Druck-Apps mit freier mm-Eingabe – kein verlässlicher
   genereller Fix, eher ein Nutzer-Workaround im Einzelfall.
 
-### Variante A – Dieselbe Karte mehrfach auf einem Bogen ✅ umgesetzt (v1.1.0)
+### Variante A – Dieselbe Karte mehrfach auf einem Bogen ✅ umgesetzt (v1.1.0/v1.2.0)
 
-Die aktuell offene Karte wird N-mal (1–9, frei wählbar, Raster mit max. 3
-Spalten/Zeilen) in korrekter Größe (62×90 mm) auf eine A4-PDF-Seite gesetzt,
-mit dünnen gestrichelten Schnittlinien. Details siehe
-[`architecture.md`](architecture.md#pdf-druckbogen-export).
+Die aktuell offene Karte wird mehrfach in korrekter physischer Größe auf
+eine A4-PDF-Seite gesetzt, mit dünnen gestrichelten Schnittlinien. Details
+siehe [`architecture.md`](architecture.md#pdf-druckbogen-export).
 
-- **Umfang der ersten Version**: Es wird immer nur die Kartenvorderseite
-  gedruckt – eine gewählte Rückseite (Variante "Normal"/"Golden") wird für
-  den Druckbogen ignoriert. Falls gewünscht, könnte das in einer späteren
-  Version ergänzt werden (jede Karte im Raster müsste dann aus einem
-  Vorder-/Rückseiten-Paar bestehen statt aus einer einzelnen Kachel).
+- **v1.1.0**: erste Version mit frei wählbarer Anzahl (1–9) und nur
+  Kartenvorderseite (eine gewählte Rückseite wurde ignoriert).
+- **v1.2.0**: auf Wunsch vereinfacht (weniger Entscheidungen für Kinder)
+  und um die Rückseite ergänzt – Anzahl ist jetzt fest und richtet sich
+  automatisch nach der Rückseiten-Auswahl: 9 Karten (3×3) ohne Rückseite,
+  4 Karten (2×2, quer gedreht) mit Rückseite.
 
 ### Variante B – Sammlung mehrerer unterschiedlicher Karten auf einem Bogen
 
