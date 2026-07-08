@@ -201,8 +201,6 @@ gängigen PDF-Renderern korrekt in Originalgröße gedruckt, sofern beim Drucken
   - Beide Fälle nutzen dieselbe Hilfsfunktion `drawPrintGrid()` (Spalten,
     Zeilen, Einheitsgröße als Parameter), inkl. zentriertem Raster und
     dünnen gestrichelten Schnittlinien zwischen den Einheiten.
-  - Ein Hinweistext unter dem Button (`#pdfHint`) zeigt die jeweils
-    aktuell geltende Stückzahl an, aktualisiert in `updateBackSelection()`.
 - `CARD_WIDTH_MM`/`CARD_HEIGHT_MM` sind die einzige Quelle der Wahrheit für
   die physische Kartengröße – sowohl die JPG-Export-Canvas-Auflösung
   (`EXPORT_W`/`EXPORT_H`, abgeleitet über `PX_PER_MM`) als auch beide

@@ -55,7 +55,6 @@ const previewStars = document.getElementById('previewStars');
 const exportBtn = document.getElementById('exportBtn');
 const exportHint = document.getElementById('exportHint');
 const exportPdfBtn = document.getElementById('exportPdfBtn');
-const pdfHint = document.getElementById('pdfHint');
 
 const cropperModal = document.getElementById('cropperModal');
 const cropperImage = document.getElementById('cropperImage');
@@ -110,10 +109,6 @@ function updateBackSelection() {
   [...backPresetsEl.children].forEach((btn) => {
     btn.classList.toggle('selected', btn.dataset.back === state.cardBack);
   });
-  pdfHint.textContent =
-    state.cardBack === 'none'
-      ? '9 Karten pro A4-Blatt'
-      : '4 Karten pro A4-Blatt (inkl. Rückseite, quer gedreht)';
 }
 updateBackSelection();
 
