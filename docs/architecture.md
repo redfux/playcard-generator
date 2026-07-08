@@ -12,6 +12,8 @@ Bewusst einfach gehalten, kein Build-Prozess nötig:
 - **[Cropper.js](https://github.com/fengyuanchen/cropperjs) 1.6.2** (MIT-Lizenz)
   für den Bildzuschnitt – selbst gehostet unter `vendor/cropperjs/`, kein CDN
 - **Canvas API** für das Zusammensetzen der Karte und den JPG-Export
+- **[jsPDF](https://github.com/parallax/jsPDF) 4.2.1** (MIT-Lizenz) für den
+  PDF-Druckbogen-Export – selbst gehostet unter `vendor/jspdf/`, kein CDN
 - **Selbst gehostete Schriften**: "Baloo 2", "Roboto" und "Material Symbols
   Outlined" – ursprünglich von Google Fonts, liegen aber als lokale Dateien
   im Projekt (siehe "Selbst gehostete Ressourcen" weiter unten)
@@ -30,6 +32,8 @@ playcard-generator/
 ├── vendor/cropperjs/
 │   ├── cropper.min.js    Cropper.js 1.6.2 (MIT), selbst gehostet statt CDN
 │   └── cropper.min.css
+├── vendor/jspdf/
+│   └── jspdf.umd.min.js  jsPDF 4.2.1 (MIT), selbst gehostet statt CDN
 ├── assets/
 │   ├── back-normal.jpeg    Kartenrückseite "Normal" (62×90mm), nur für die Auswahl-Vorschau
 │   ├── back-gold.jpeg      Kartenrückseite "Golden" (62×90mm), nur für die Auswahl-Vorschau
@@ -163,6 +167,36 @@ Kartengröße; `appendCardBack()` prüft danach, ob eine Rückseite gewählt ist
   Verzerrung.
 - Es gibt bewusst **keine** Live-Vorschau der Rückseite auf der Karte – nur
   die Auswahl-Kachel zeigt eine Miniaturansicht.
+
+### PDF-Druckbogen-Export
+
+Grund und geprüfte Alternativen siehe
+[`feature-requests.md`](feature-requests.md) (Abschnitt "Karten in korrekter
+physischer Größe … drucken"). Kurzfassung: Normale JPG-Ausdrucke über den
+Handy-"Drucken"-Dialog werden von Android/iOS immer auf die volle A4-Seite
+skaliert. Ein PDF mit exakter Seitengeometrie in mm wird dagegen von allen
+gängigen PDF-Renderern korrekt in Originalgröße gedruckt, sofern beim Drucken
+*"Tatsächliche Größe"* statt *"An Seite anpassen"* gewählt wird.
+
+- `renderCardCanvas()` (in `app.js`) enthält die komplette Zeichenlogik der
+  Kartenvorderseite und ist von `exportCard()` (JPG) und `exportPdfSheet()`
+  (PDF) gemeinsam genutzt – beide Export-Wege bleiben dadurch garantiert
+  pixelidentisch.
+- `exportPdfSheet()` erzeugt ein A4-PDF (`jsPDF`, portrait, Einheit `mm`) und
+  platziert die gewählte Anzahl (1–9, per Dropdown) Kopien der Karte in
+  einem Raster mit maximal 3 Spalten/Zeilen (mehr passt bei 62×90 mm nicht
+  verzerrungsfrei auf A4: `floor(210/62) = 3`, `floor(297/90) = 3`). Das
+  Raster wird auf der Seite zentriert, dünne gestrichelte Linien markieren
+  die Schnittkanten zwischen den Karten.
+- `CARD_WIDTH_MM`/`CARD_HEIGHT_MM` sind die einzige Quelle der Wahrheit für
+  die physische Kartengröße – sowohl die JPG-Export-Canvas-Auflösung
+  (`EXPORT_W`/`EXPORT_H`, abgeleitet über `PX_PER_MM`) als auch die
+  PDF-Platzierung rechnen von diesen zwei Werten ab, damit beide Formate
+  nie auseinanderlaufen können.
+- **Bewusste Einschränkung der ersten Version**: Es wird immer nur die
+  Kartenvorderseite gedruckt, unabhängig von einer gewählten Rückseite
+  ("Normal"/"Golden"). Das hält die erste Version einfach; siehe
+  `feature-requests.md` für die Überlegung, das später zu erweitern.
 
 ## Bekannte Stolpersteine (für künftige Änderungen)
 

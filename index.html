@@ -101,6 +101,24 @@
         <span class="material-symbols-outlined">download</span>Karte speichern
       </button>
       <p class="hint" id="exportHint">Gib zuerst einen Namen ein.</p>
+
+      <div class="pdf-export">
+        <label for="pdfCopyCount">Kopien auf dem Druckbogen (A4)</label>
+        <select id="pdfCopyCount">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9" selected>9</option>
+        </select>
+        <button id="exportPdfBtn" class="btn btn-secondary btn-large" type="button" disabled>
+          <span class="material-symbols-outlined">print</span>Als PDF für den Druck
+        </button>
+      </div>
     </section>
 
   </main>
@@ -130,6 +148,7 @@
 </div>
 
 <script src="vendor/cropperjs/cropper.min.js"></script>
+<script src="vendor/jspdf/jspdf.umd.min.js"></script>
 <script src="assets/card-backs-data.js"></script>
 <script src="app.js"></script>
 </body>

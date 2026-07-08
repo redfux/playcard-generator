@@ -30,15 +30,18 @@ Geprüfte, verworfene Alternativen:
 - Drittanbieter-Druck-Apps mit freier mm-Eingabe – kein verlässlicher
   genereller Fix, eher ein Nutzer-Workaround im Einzelfall.
 
-### Variante A – Dieselbe Karte mehrfach auf einem Bogen
+### Variante A – Dieselbe Karte mehrfach auf einem Bogen ✅ umgesetzt (v1.1.0)
 
-Die aktuell offene Karte wird N-mal (z. B. 3×3-Raster) in korrekter Größe
-(62×90 mm) auf eine A4-PDF-Seite gesetzt, mit dünnen Schnittlinien.
+Die aktuell offene Karte wird N-mal (1–9, frei wählbar, Raster mit max. 3
+Spalten/Zeilen) in korrekter Größe (62×90 mm) auf eine A4-PDF-Seite gesetzt,
+mit dünnen gestrichelten Schnittlinien. Details siehe
+[`architecture.md`](architecture.md#pdf-druckbogen-export).
 
-- **Aufwand**: gering.
-- **Architektur**: keine Änderung nötig – nutzt einfach das bereits
-  gerenderte Karten-Canvas mehrfach. Kein neuer Zustand.
-- **Deckt ab**: "Ich will mehrere Exemplare derselben Karte ausdrucken."
+- **Umfang der ersten Version**: Es wird immer nur die Kartenvorderseite
+  gedruckt – eine gewählte Rückseite (Variante "Normal"/"Golden") wird für
+  den Druckbogen ignoriert. Falls gewünscht, könnte das in einer späteren
+  Version ergänzt werden (jede Karte im Raster müsste dann aus einem
+  Vorder-/Rückseiten-Paar bestehen statt aus einer einzelnen Kachel).
 
 ### Variante B – Sammlung mehrerer unterschiedlicher Karten auf einem Bogen
 
@@ -57,7 +60,6 @@ auf einen Bogen gedruckt.
   wäre die erste Datenspeicherung im Projekt und müsste laut Masterprompt
   in `features.md`/`architecture.md` dokumentiert werden.
 
-### Empfehlung, falls umgesetzt wird
+### Empfehlung für Variante B, falls umgesetzt wird
 
-Erst Variante A bauen (liefert schnell echten Mehrwert, kein Risiko), dann
-je nach Bedarf Variante B als Ausbau nachziehen.
+Kann unabhängig von Variante A nachgezogen werden, sobald Bedarf besteht.

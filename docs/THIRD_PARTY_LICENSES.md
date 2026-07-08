@@ -60,3 +60,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## jsPDF
+
+- **Datei**: `vendor/jspdf/jspdf.umd.min.js`
+- **Version**: 4.2.1
+- **Urheber**: James Hall und weitere Mitwirkende (siehe Lizenzkopf in der
+  Datei)
+- **Lizenz**: MIT License
+- **Quelle**: https://github.com/parallax/jsPDF
+
+Lizenztext identisch zum MIT-License-Wortlaut oben (Cropper.js), mit
+abweichenden Copyright-Inhabern gemäß Lizenzkopf in `jspdf.umd.min.js`.

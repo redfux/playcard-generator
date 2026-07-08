@@ -4,6 +4,21 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/). Rückwirkend aus der
 Git-Historie rekonstruiert.
 
+## [1.1.0]
+
+### Added
+- PDF-Druckbogen-Export: Die aktuelle Kartenvorderseite kann in 1 bis 9
+  frei wählbaren Kopien auf einer A4-Seite exportiert werden, jeweils exakt
+  in physischer Kartengröße (62×90 mm) mit dünnen Schnittlinien. Löst das
+  Problem, dass der normale Drucken-Dialog von Android/iOS Bilder immer auf
+  die volle Seite skaliert (dokumentiert in `docs/feature-requests.md`).
+  Umgesetzt via lokal eingebundenem jsPDF (MIT-Lizenz).
+
+### Changed
+- Interne Zeichenlogik der Kartenvorderseite (`renderCardCanvas()`) aus dem
+  JPG-Export herausgelöst, damit JPG- und PDF-Export dieselbe Funktion
+  nutzen und garantiert identisch aussehen.
+
 ## [1.0.0]
 
 ### Added

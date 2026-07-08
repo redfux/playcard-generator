@@ -37,6 +37,14 @@ Für die Entstehungsgeschichte siehe [`releases.md`](releases.md).
   ausschneiden, einmal in der Mitte falten und zusammenkleben kann.
 - Ohne gewählte Rückseite bleibt der Export unverändert (nur die
   Kartenvorderseite).
+- **PDF-Druckbogen**: Export als PDF auf einer A4-Seite, mit 1 bis 9 frei
+  wählbaren Kopien der aktuellen Kartenvorderseite in einem Raster
+  (max. 3×3), jeweils exakt in physischer Kartengröße (62×90 mm) platziert,
+  mit dünnen Schnittlinien. Löst das Problem, dass normale Handy-Druckdialoge
+  Bilder immer auf die volle Seite skalieren – beim Drucken muss "Tatsächliche
+  Größe"/"Originalgröße" statt "An Seite anpassen" gewählt werden. Enthält
+  aktuell nur die Vorderseite, unabhängig von einer gewählten Rückseite
+  (siehe [`feature-requests.md`](feature-requests.md)).
 
 ## Datenschutz & Offline-Fähigkeit
 

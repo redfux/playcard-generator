@@ -1,6 +1,6 @@
 // thought up by human, created by ai
 
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.1.0';
 
 // ---------- State ----------
 const MAX_STATS = 5;
@@ -54,6 +54,8 @@ const previewStars = document.getElementById('previewStars');
 
 const exportBtn = document.getElementById('exportBtn');
 const exportHint = document.getElementById('exportHint');
+const pdfCopyCountSelect = document.getElementById('pdfCopyCount');
+const exportPdfBtn = document.getElementById('exportPdfBtn');
 
 const cropperModal = document.getElementById('cropperModal');
 const cropperImage = document.getElementById('cropperImage');
@@ -263,6 +265,7 @@ document.fonts.ready.then(fitCardName);
 function updateExportAvailability() {
   const ready = state.name.trim().length > 0;
   exportBtn.disabled = !ready;
+  exportPdfBtn.disabled = !ready;
   exportHint.hidden = ready;
 }
 updateExportAvailability();
@@ -333,9 +336,12 @@ cropConfirmBtn.addEventListener('click', () => {
 });
 
 // ---------- Export to JPG ----------
-// 62 x 90 mm card at 20px/mm for high print resolution.
-const EXPORT_W = 1240;
-const EXPORT_H = 1800;
+// Physical card size, used both for the JPG canvas resolution and the PDF print sheet.
+const CARD_WIDTH_MM = 62;
+const CARD_HEIGHT_MM = 90;
+const PX_PER_MM = 20; // high print resolution (~508 DPI)
+const EXPORT_W = CARD_WIDTH_MM * PX_PER_MM;
+const EXPORT_H = CARD_HEIGHT_MM * PX_PER_MM;
 const BORDER = 34;
 
 function roundRectPath(ctx, x, y, w, h, r) {
@@ -429,7 +435,7 @@ function drawStar(ctx, cx, cy, outerRadius, filled) {
   ctx.stroke();
 }
 
-async function exportCard() {
+async function renderCardCanvas() {
   await document.fonts.load('700 64px "Baloo 2"');
   await document.fonts.load('700 37px "Roboto"');
   await document.fonts.ready;
@@ -597,6 +603,11 @@ async function exportCard() {
     starX += starSize * 2 + starGap;
   }
 
+  return canvas;
+}
+
+async function exportCard() {
+  const canvas = await renderCardCanvas();
   const finalCanvas = await appendCardBack(canvas);
 
   finalCanvas.toBlob(
@@ -614,6 +625,49 @@ async function exportCard() {
     'image/jpeg',
     0.92
   );
+}
+
+const A4_WIDTH_MM = 210;
+const A4_HEIGHT_MM = 297;
+const PRINT_SHEET_GAP_MM = 6;
+
+async function exportPdfSheet() {
+  const count = parseInt(pdfCopyCountSelect.value, 10);
+  const canvas = await renderCardCanvas();
+  const imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+  const cols = Math.min(3, count);
+  const rows = Math.ceil(count / cols);
+  const gridW = cols * CARD_WIDTH_MM + (cols - 1) * PRINT_SHEET_GAP_MM;
+  const gridH = rows * CARD_HEIGHT_MM + (rows - 1) * PRINT_SHEET_GAP_MM;
+  const offsetX = (A4_WIDTH_MM - gridW) / 2;
+  const offsetY = (A4_HEIGHT_MM - gridH) / 2;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  for (let i = 0; i < count; i++) {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const x = offsetX + col * (CARD_WIDTH_MM + PRINT_SHEET_GAP_MM);
+    const y = offsetY + row * (CARD_HEIGHT_MM + PRINT_SHEET_GAP_MM);
+    doc.addImage(imgData, 'JPEG', x, y, CARD_WIDTH_MM, CARD_HEIGHT_MM);
+  }
+
+  // Dashed cut guides through the middle of each gap between cards.
+  doc.setDrawColor(180);
+  doc.setLineDashPattern([1.5, 1.5], 0);
+  for (let c = 1; c < cols; c++) {
+    const x = offsetX + c * CARD_WIDTH_MM + (c - 0.5) * PRINT_SHEET_GAP_MM;
+    doc.line(x, offsetY, x, offsetY + gridH);
+  }
+  for (let r = 1; r < rows; r++) {
+    const y = offsetY + r * CARD_HEIGHT_MM + (r - 0.5) * PRINT_SHEET_GAP_MM;
+    doc.line(offsetX, y, offsetX + gridW, y);
+  }
+
+  const safeName = (state.name.trim() || 'karte').replace(/[^a-z0-9äöüß_-]+/gi, '_');
+  doc.save(`${safeName}-druckbogen.pdf`);
 }
 
 async function appendCardBack(frontCanvas) {
@@ -662,4 +716,9 @@ function drawImageCover(ctx, img, x, y, w, h) {
 exportBtn.addEventListener('click', () => {
   if (exportBtn.disabled) return;
   exportCard();
+});
+
+exportPdfBtn.addEventListener('click', () => {
+  if (exportPdfBtn.disabled) return;
+  exportPdfSheet();
 });
