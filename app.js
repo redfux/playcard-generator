@@ -162,7 +162,8 @@ function renderStatsRows() {
     const removeBtn = document.createElement('button');
     removeBtn.type = 'button';
     removeBtn.className = 'remove-stat';
-    removeBtn.innerHTML = '<span class="material-symbols-outlined">close</span>';
+    removeBtn.setAttribute('aria-label', 'Eigenschaft entfernen');
+    removeBtn.innerHTML = '<span class="material-symbols-outlined">delete</span>';
     removeBtn.addEventListener('click', () => {
       state.stats.splice(index, 1);
       if (state.stats.length === 0) state.stats.push({ label: '', value: '' });
@@ -172,7 +173,7 @@ function renderStatsRows() {
 
     const topRow = document.createElement('div');
     topRow.className = 'stat-row-top';
-    topRow.append(labelInput, removeBtn);
+    topRow.append(removeBtn, labelInput);
 
     row.append(topRow, valueInput);
     statsListEl.appendChild(row);
